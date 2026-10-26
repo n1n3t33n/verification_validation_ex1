@@ -254,3 +254,12 @@ l'application de reservation GUDLFT (projet verification & validation).
   - `test_showsummary_sans_champ_email_ne_plante_pas`.
 - **Verification** : cycle TDD rouge (400) puis vert
   (28/28 tests, aucune regression).
+
+### Complement — Test de deconnexion (couverture 100 %)
+**Branche** : `amelioration/test-logout`
+
+- **But** : couvrir la route `logout` (seule ligne non testee) et atteindre 100 %
+  de couverture.
+- **Ajout test** : `test/functional/test_deconnexion.py`
+  - `test_logout_redirige_vers_accueil` (redirection vers l'accueil).
+- **Verification** : 29/29 tests, couverture **100 %** (`server.py` + `conftest.py`).
