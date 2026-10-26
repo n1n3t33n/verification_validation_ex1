@@ -7,7 +7,7 @@ par des tests. Objectif de couverture du guide : **>= 60 %**.
 
 ## Resultat global
 
-- **29 tests**, **100 % reussis**.
+- **34 tests**, **100 % reussis**.
 - **Couverture : 100 %** (`server.py` et `conftest.py`), mesuree avec `coverage`.
 
 ## Outils et methode
@@ -34,17 +34,17 @@ Les tests sont regroupes dans `test/` (sous-dossier `functional/`). Les tests
 sont **fonctionnels** : ils exercent les routes via le client de test Flask,
 ce qui donne une couverture de 100 % du comportement reel de l'application.
 
-> Note : les dossiers `test/unit/` et `test/integration/` sont prevus par la
-> convention mais restent vides ; la logique metier etant portee par les vues
-> (routes), les tests fonctionnels ont ete privilegies. Des tests unitaires de
-> `loadClubs` / `loadCompetitions` pourraient les completer si souhaite.
+> Note : `test/unit/` contient des tests unitaires des fonctions de chargement
+> (`loadClubs` / `loadCompetitions`). Le reste des tests est fonctionnel (routes
+> via le client Flask), la logique metier etant portee par les vues.
+> `test/integration/` reste vide.
 
 ## Inventaire des tests
 
 | Fichier | Nb | Portee |
 |---------|----|--------|
 | `test_lancement.py` | 2 | Demarrage, page d'accueil |
-| `test_connexion.py` | 4 | Connexion (email connu/inconnu/manquant) |
+| `test_connexion.py` | 6 | Connexion, session, resume (/summary) |
 | `test_reservation.py` | 10 | Points, 12 max, places dispo, deduction, 0/negatif |
 | `test_book.py` | 3 | Route book (noms invalides) |
 | `test_saisie.py` | 3 | Entrees non numeriques / champs manquants |
@@ -52,7 +52,8 @@ ce qui donne une couverture de 100 % du comportement reel de l'application.
 | `test_competition_passee.py` | 2 | Refus sur competition passee |
 | `test_tableau_points.py` | 2 | Tableau public des points |
 | `test_deconnexion.py` | 1 | Deconnexion |
-| **Total** | **29** | |
+| `test_data.py` (unit) | 3 | Chargement des donnees (fonctions pures) |
+| **Total** | **34** | |
 
 ## Correctifs couverts
 
