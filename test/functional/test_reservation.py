@@ -104,3 +104,27 @@ def test_points_non_deduits_si_reservation_refusee(client):
     })
 
     assert b'Points available: 4' in response.data
+
+
+def test_reservation_places_negatives_est_refusee(client):
+    # Un nombre negatif ne doit pas etre accepte (il crediterait des points !).
+    response = client.post('/purchasePlaces', data={
+        'competition': 'Spring Festival',
+        'club': 'Iron Temple',
+        'places': '-5',
+    })
+
+    assert b'superieur a zero' in response.data
+    # Le solde du club ne doit pas avoir augmente.
+    assert b'Points available: 4' in response.data
+
+
+def test_reservation_zero_place_est_refusee(client):
+    # Reserver 0 place n'a pas de sens : la demande doit etre refusee.
+    response = client.post('/purchasePlaces', data={
+        'competition': 'Spring Festival',
+        'club': 'Iron Temple',
+        'places': '0',
+    })
+
+    assert b'superieur a zero' in response.data

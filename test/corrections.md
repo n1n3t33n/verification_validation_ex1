@@ -30,6 +30,9 @@ l'application de reservation GUDLFT (projet verification & validation).
 | 6 | `bug/deduction-des-points` | Points jamais deduits | ✅ Corrige |
 | 7 | `fonctionnalite/tableau-des-points` | Tableau public des points (phase 2) | ✅ Fait |
 | 8 | `amelioration/competitions-passees` | Reservation sur competition passee | ✅ Corrige |
+| 9 | `bug/places-negatives-ou-nulles` | Reserver un nombre nul ou negatif de places | ✅ Corrige |
+| 10 | `bug/book-nom-invalide` | Route book : nom de club/competition inexistant -> 500 | ⏳ A venir |
+| 11 | `bug/saisie-non-numerique` | Champ places vide/non numerique -> 500 | ⏳ A venir |
 
 ---
 
@@ -161,3 +164,20 @@ l'application de reservation GUDLFT (projet verification & validation).
   - `test_reservation_sur_competition_future_est_acceptee`.
 - **Verification** : cycle TDD rouge (reservation passee acceptee) puis vert
   (17/17 tests, aucune regression).
+
+### Bug 9 — Places negatives ou nulles
+**Branche** : `bug/places-negatives-ou-nulles`
+
+- **Symptome** : un nombre de places negatif ou nul passait tous les garde-fous
+  (`placesRequired > ...` toujours faux) ; un negatif **creditait** meme des
+  points et des places au club (exploit).
+- **Cause** : `server.py`, `purchasePlaces` ne verifiait pas que
+  `placesRequired` etait strictement positif.
+- **Correction** : garde-fou `if placesRequired <= 0` place tot (des que
+  `placesRequired` est connu) ; message flash « Le nombre de places doit etre
+  superieur a zero. » et refus.
+- **Ajout tests** (`test/functional/test_reservation.py`) :
+  - `test_reservation_places_negatives_est_refusee` (solde inchange) ;
+  - `test_reservation_zero_place_est_refusee`.
+- **Verification** : cycle TDD rouge (negatif/zero acceptes) puis vert
+  (19/19 tests, aucune regression).

@@ -61,6 +61,12 @@ def purchasePlaces():
         return render_template('welcome.html', club=club, competitions=competitions)
 
     placesRequired = int(request.form['places'])
+
+    # On refuse une demande de places nulle ou negative.
+    if placesRequired <= 0:
+        flash("Le nombre de places doit etre superieur a zero.")
+        return render_template('welcome.html', club=club, competitions=competitions)
+
     clubPoints = int(club['points'])
 
     # Un point vaut une place : on refuse si le club demande plus que son solde.
