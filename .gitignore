@@ -1,0 +1,19 @@
+# Environnement virtuel
+venv/
+bin
+include
+lib
+.Python
+.envrc
+
+# Cache Python / pytest
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Couverture de tests
+.coverage
+htmlcov/
+
+# Fichiers systeme
+.DS_Store
