@@ -82,3 +82,25 @@ def test_reservation_egale_aux_places_disponibles_est_acceptee(client):
     })
 
     assert b'Great-booking complete!' in response.data
+
+
+def test_points_deduits_apres_reservation_reussie(client):
+    # Iron Temple a 4 points : apres reservation de 2 places, il doit en rester 2.
+    response = client.post('/purchasePlaces', data={
+        'competition': 'Spring Festival',
+        'club': 'Iron Temple',
+        'places': '2',
+    })
+
+    assert b'Points available: 2' in response.data
+
+
+def test_points_non_deduits_si_reservation_refusee(client):
+    # Iron Temple a 4 points : une reservation refusee (5 > 4) ne doit rien deduire.
+    response = client.post('/purchasePlaces', data={
+        'competition': 'Spring Festival',
+        'club': 'Iron Temple',
+        'places': '5',
+    })
+
+    assert b'Points available: 4' in response.data

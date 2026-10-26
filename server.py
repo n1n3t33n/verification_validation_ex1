@@ -73,6 +73,8 @@ def purchasePlaces():
         return render_template('welcome.html', club=club, competitions=competitions)
 
     competition['numberOfPlaces'] = placesDisponibles - placesRequired
+    # Les points utilises sont deduits du solde du club (1 point par place).
+    club['points'] = clubPoints - placesRequired
     flash('Great-booking complete!')
     return render_template('welcome.html', club=club, competitions=competitions)
 

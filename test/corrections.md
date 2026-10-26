@@ -27,7 +27,7 @@ l'application de reservation GUDLFT (projet verification & validation).
 | 3 | `bug/reservation-superieure-aux-points` | Reserver plus que ses points | ✅ Corrige |
 | 4 | `bug/reservation-superieure-a-12-places` | Reserver plus de 12 places | ✅ Corrige |
 | 5 | `bug/places-insuffisantes-competition` | Reserver plus de places que disponibles | ✅ Corrige |
-| 6 | `bug/deduction-des-points` | Points jamais deduits | ⏳ A venir |
+| 6 | `bug/deduction-des-points` | Points jamais deduits | ✅ Corrige |
 | 7 | `fonctionnalite/tableau-des-points` | Tableau public des points (phase 2) | ⏳ A venir |
 | 8 | `amelioration/competitions-passees` | Reservation sur competition passee | ⏳ Optionnel |
 
@@ -111,3 +111,19 @@ l'application de reservation GUDLFT (projet verification & validation).
   - `test_reservation_egale_aux_places_disponibles_est_acceptee` (borne exacte).
 - **Verification** : cycle TDD rouge (surreservation a -1) puis vert
   (11/11 tests, aucune regression).
+
+### Bug 6 — Deduction des points
+**Branche** : `bug/deduction-des-points`
+
+- **Symptome** : une reservation reussie decrementait les places de la
+  competition mais ne retirait jamais les points au club.
+- **Cause** : `server.py`, `purchasePlaces` ne mettait jamais a jour
+  `club['points']`.
+- **Correction** : dans la voie de succes, `club['points'] = clubPoints -
+  placesRequired` (1 point par place), apres tous les garde-fous (une
+  reservation refusee ne deduit rien).
+- **Ajout tests** (`test/functional/test_reservation.py`) :
+  - `test_points_deduits_apres_reservation_reussie` (Iron Temple 4 -> 2) ;
+  - `test_points_non_deduits_si_reservation_refusee` (solde inchange si refus).
+- **Verification** : cycle TDD rouge (points non deduits) puis vert
+  (13/13 tests, aucune regression).
