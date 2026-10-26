@@ -2,6 +2,8 @@ import json
 from datetime import datetime
 from flask import Flask,render_template,request,redirect,flash,url_for,session
 
+import booking
+
 
 def loadClubs():
     with open('clubs.json') as c:
@@ -18,14 +20,17 @@ def loadCompetitions():
 app = Flask(__name__)
 app.secret_key = 'something_special'
 
-# Nombre maximum de places qu'un club peut reserver pour une competition (cumul).
-MAX_PLACES_PAR_COMPETITION = 12
-
 competitions = loadCompetitions()
 clubs = loadClubs()
 
 # Suivi du cumul de places reservees par (club, competition).
 reservationsParClub = {}
+
+
+def render_welcome(club):
+    """Rend la page de resume d'un club (facteur commun a plusieurs vues)."""
+    return render_template('welcome.html', club=club, competitions=competitions)
+
 
 @app.route('/')
 def index():
@@ -41,7 +46,7 @@ def showSummary():
     club = matching[0]
     # Ouvre la session du secretaire pour garder le contexte entre les pages.
     session['email'] = club['email']
-    return render_template('welcome.html', club=club, competitions=competitions)
+    return render_welcome(club)
 
 
 @app.route('/book/<competition>/<club>')
@@ -66,52 +71,35 @@ def purchasePlaces():
     competition = foundCompetition[0]
     club = foundClub[0]
 
-    # On refuse la reservation si la competition est deja passee.
-    dateCompetition = datetime.strptime(competition['date'], '%Y-%m-%d %H:%M:%S')
-    if dateCompetition < datetime.now():
-        flash("Cette competition est deja passee, reservation impossible.")
-        return render_template('welcome.html', club=club, competitions=competitions)
-
-    # Le nombre de places doit etre un entier valide.
+    # Parsing de l'entree (frontiere) : le nombre de places doit etre un entier.
     try:
         placesRequired = int(request.form.get('places', ''))
     except ValueError:
         flash("Veuillez saisir un nombre de places valide.")
-        return render_template('welcome.html', club=club, competitions=competitions)
-
-    # On refuse une demande de places nulle ou negative.
-    if placesRequired <= 0:
-        flash("Le nombre de places doit etre superieur a zero.")
-        return render_template('welcome.html', club=club, competitions=competitions)
-
-    clubPoints = int(club['points'])
-
-    # Un point vaut une place : on refuse si le club demande plus que son solde.
-    if placesRequired > clubPoints:
-        flash("Vous n'avez pas assez de points pour reserver autant de places.")
-        return render_template('welcome.html', club=club, competitions=competitions)
+        return render_welcome(club)
 
     cle = (club['name'], competition['name'])
     dejaReservees = reservationsParClub.get(cle, 0)
-    # Regle metier : au maximum 12 places cumulees par club et par competition.
-    if dejaReservees + placesRequired > MAX_PLACES_PAR_COMPETITION:
-        flash("Vous ne pouvez pas reserver plus de 12 places pour cette competition.")
-        return render_template('welcome.html', club=club, competitions=competitions)
 
-    placesDisponibles = int(competition['numberOfPlaces'])
+    # Toute la regle metier est deportee dans le module booking.
+    autorise, message = booking.verifier_reservation(
+        date_competition=competition['date'],
+        maintenant=datetime.now(),
+        places=placesRequired,
+        places_disponibles=int(competition['numberOfPlaces']),
+        points_club=int(club['points']),
+        deja_reservees=dejaReservees,
+    )
+    if not autorise:
+        flash(message)
+        return render_welcome(club)
 
-    # On refuse si la competition n'a pas assez de places disponibles.
-    if placesRequired > placesDisponibles:
-        flash("Il n'y a pas assez de places disponibles pour cette competition.")
-        return render_template('welcome.html', club=club, competitions=competitions)
-
-    competition['numberOfPlaces'] = placesDisponibles - placesRequired
-    # Les points utilises sont deduits du solde du club (1 point par place).
-    club['points'] = clubPoints - placesRequired
-    # On met a jour le cumul de places reservees pour cette competition.
+    # Application de l'etat (mutation des donnees en memoire).
+    competition['numberOfPlaces'] = int(competition['numberOfPlaces']) - placesRequired
+    club['points'] = int(club['points']) - placesRequired
     reservationsParClub[cle] = dejaReservees + placesRequired
     flash('Great-booking complete!')
-    return render_template('welcome.html', club=club, competitions=competitions)
+    return render_welcome(club)
 
 
 @app.route('/summary')
@@ -121,7 +109,7 @@ def summary():
     club = [c for c in clubs if c['email'] == email]
     if not club:
         return redirect(url_for('index'))
-    return render_template('welcome.html', club=club[0], competitions=competitions)
+    return render_welcome(club[0])
 
 
 @app.route('/pointsBoard')
