@@ -33,7 +33,8 @@ def index():
 
 @app.route('/showSummary',methods=['POST'])
 def showSummary():
-    matching = [c for c in clubs if c['email'] == request.form['email']]
+    # request.form.get evite l'erreur 400 si le champ 'email' est absent.
+    matching = [c for c in clubs if c['email'] == request.form.get('email', '')]
     if not matching:
         flash("Email inconnu, veuillez reessayer.")
         return render_template('index.html')

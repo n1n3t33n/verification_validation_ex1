@@ -26,3 +26,11 @@ def test_email_connu_affiche_le_resume(client):
 
     assert response.status_code == 200
     assert b'Welcome' in response.data
+
+
+def test_showsummary_sans_champ_email_ne_plante_pas(client):
+    """Une requete sans champ 'email' ne doit pas renvoyer une erreur 400."""
+    response = client.post('/showSummary', data={})
+
+    assert response.status_code == 200
+    assert b'Email inconnu' in response.data
