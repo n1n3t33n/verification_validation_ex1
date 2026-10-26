@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}GUDLFT{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header class="site-header" data-header>
+        <div class="container site-header__inner">
+            <a class="brand" href="{{ url_for('summary') if session.get('email') else url_for('index') }}">G&Uuml;DLFT</a>
+            <nav class="site-nav" aria-label="Navigation principale">
+                {% if session.get('email') %}
+                    <a href="{{ url_for('summary') }}">Mes comp&eacute;titions</a>
+                    <a href="{{ url_for('pointsBoard') }}">Points des clubs</a>
+                    <a class="nav-logout" href="{{ url_for('logout') }}">D&eacute;connexion</a>
+                {% else %}
+                    {% block public_nav %}{% endblock %}
+                {% endif %}
+            </nav>
+        </div>
+    </header>
+
+    <main class="container page">
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <div class="alerts" data-alerts>
+            {% for message in messages %}
+              <p class="alert">{{ message }}</p>
+            {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">G&Uuml;DLFT &mdash; plateforme de r&eacute;servation r&eacute;gionale</div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}" defer></script>
+</body>
+</html>

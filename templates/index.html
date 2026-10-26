@@ -1,25 +1,29 @@
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GUDLFT Registration</title>
-</head>
-<body>
-    <h1>Welcome to the GUDLFT Registration Portal!</h1>
-    {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        <ul>
-        {% for message in messages %}
-          <li>{{ message }}</li>
-        {% endfor %}
+{% extends "layout.html" %}
+{% block title %}Connexion | GUDLFT{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero__intro">
+        <p class="eyebrow">Plateforme de r&eacute;servation r&eacute;gionale</p>
+        <h1>Welcome to the GUDLFT Registration Portal!</h1>
+        <p class="lede">R&eacute;servez des places pour vos athl&egrave;tes aux comp&eacute;titions &agrave; venir, et suivez le solde de points de votre club.</p>
+        <ul class="hero__features">
+            <li>Connexion par email de secr&eacute;taire</li>
+            <li>R&eacute;servation en quelques secondes</li>
+            <li>Solde de points toujours &agrave; jour</li>
         </ul>
-      {% endif %}
-    {% endwith %}
-    Please enter your secretary email to continue:
-    <form action="showSummary" method="post">
-        <label for="email">Email:</label>
-        <input type="email" name="email" id=""/>
-        <button type="submit">Enter</button>
-    </form>
-</body>
-</html>
+    </div>
+
+    <div class="hero__card card">
+        <h2 class="card-title">Connexion secr&eacute;taire</h2>
+        <p class="muted">Please enter your secretary email to continue:</p>
+        <form class="form" action="showSummary" method="post">
+            <div class="field">
+                <label for="email">Email</label>
+                <input type="email" name="email" id="email" required placeholder="secretaire@club.co" autofocus>
+            </div>
+            <button class="btn btn-primary btn-block" type="submit">Enter</button>
+        </form>
+    </div>
+</section>
+{% endblock %}
