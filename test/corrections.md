@@ -33,6 +33,8 @@ l'application de reservation GUDLFT (projet verification & validation).
 | 9 | `bug/places-negatives-ou-nulles` | Reserver un nombre nul ou negatif de places | ✅ Corrige |
 | 10 | `bug/book-nom-invalide` | Route book : nom de club/competition inexistant -> 500 | ✅ Corrige |
 | 11 | `bug/saisie-non-numerique` | Champ places vide/non numerique -> 500 | ✅ Corrige |
+| 12 | `bug/limite-12-cumulee` | Limite des 12 places non cumulee par competition | ✅ Corrige |
+| 13 | `bug/showsummary-email-manquant` | showSummary sans champ email -> 400 | ⏳ A venir |
 
 ---
 
@@ -218,3 +220,23 @@ l'application de reservation GUDLFT (projet verification & validation).
   - `test_competition_inconnue_ne_plante_pas`.
 - **Verification** : cycle TDD rouge (ValueError/IndexError 500) puis vert
   (25/25 tests, aucune regression).
+
+### Bug 12 — Limite des 12 places cumulee
+**Branche** : `bug/limite-12-cumulee`
+
+- **Symptome** : la limite de 12 places etait verifiee par reservation, pas en
+  cumul ; un club pouvait reserver 12 puis encore 12 sur la meme competition.
+- **Cause** : `server.py`, aucun suivi du total deja reserve par club et par
+  competition.
+- **Correction** :
+  - registre `reservationsParClub` (dict `(club, competition) -> total`) ;
+  - constante renommee `MAX_PLACES_PAR_COMPETITION` ;
+  - garde-fou `dejaReservees + placesRequired > 12` ; mise a jour du cumul en
+    cas de succes.
+- **Infra tests** : remise a zero de `reservationsParClub` entre chaque test
+  (`conftest.py`).
+- **Ajout tests** : `test/functional/test_cumul_places.py`
+  - `test_cumul_superieur_a_12_est_refuse` (7 puis 6) ;
+  - `test_cumul_jusqu_a_12_est_accepte` (5 puis 5).
+- **Verification** : cycle TDD rouge (cumul 13 accepte) puis vert
+  (27/27 tests, aucune regression).

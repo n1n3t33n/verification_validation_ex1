@@ -18,11 +18,14 @@ def loadCompetitions():
 app = Flask(__name__)
 app.secret_key = 'something_special'
 
-# Nombre maximum de places qu'un club peut reserver par competition.
-MAX_PLACES_PAR_RESERVATION = 12
+# Nombre maximum de places qu'un club peut reserver pour une competition (cumul).
+MAX_PLACES_PAR_COMPETITION = 12
 
 competitions = loadCompetitions()
 clubs = loadClubs()
+
+# Suivi du cumul de places reservees par (club, competition).
+reservationsParClub = {}
 
 @app.route('/')
 def index():
@@ -85,9 +88,11 @@ def purchasePlaces():
         flash("Vous n'avez pas assez de points pour reserver autant de places.")
         return render_template('welcome.html', club=club, competitions=competitions)
 
-    # Regle metier : au maximum 12 places par reservation.
-    if placesRequired > MAX_PLACES_PAR_RESERVATION:
-        flash("Vous ne pouvez pas reserver plus de 12 places.")
+    cle = (club['name'], competition['name'])
+    dejaReservees = reservationsParClub.get(cle, 0)
+    # Regle metier : au maximum 12 places cumulees par club et par competition.
+    if dejaReservees + placesRequired > MAX_PLACES_PAR_COMPETITION:
+        flash("Vous ne pouvez pas reserver plus de 12 places pour cette competition.")
         return render_template('welcome.html', club=club, competitions=competitions)
 
     placesDisponibles = int(competition['numberOfPlaces'])
@@ -100,6 +105,8 @@ def purchasePlaces():
     competition['numberOfPlaces'] = placesDisponibles - placesRequired
     # Les points utilises sont deduits du solde du club (1 point par place).
     club['points'] = clubPoints - placesRequired
+    # On met a jour le cumul de places reservees pour cette competition.
+    reservationsParClub[cle] = dejaReservees + placesRequired
     flash('Great-booking complete!')
     return render_template('welcome.html', club=club, competitions=competitions)
 

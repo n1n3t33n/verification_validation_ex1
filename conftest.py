@@ -34,3 +34,5 @@ def reset_donnees():
     date_future = (datetime.now() + timedelta(days=365)).strftime('%Y-%m-%d %H:%M:%S')
     for competition in server.competitions:
         competition['date'] = date_future
+    # On vide le registre des cumuls de reservations entre chaque test.
+    server.reservationsParClub = {}
