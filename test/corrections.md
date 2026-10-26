@@ -32,7 +32,7 @@ l'application de reservation GUDLFT (projet verification & validation).
 | 8 | `amelioration/competitions-passees` | Reservation sur competition passee | ✅ Corrige |
 | 9 | `bug/places-negatives-ou-nulles` | Reserver un nombre nul ou negatif de places | ✅ Corrige |
 | 10 | `bug/book-nom-invalide` | Route book : nom de club/competition inexistant -> 500 | ✅ Corrige |
-| 11 | `bug/saisie-non-numerique` | Champ places vide/non numerique -> 500 | ⏳ A venir |
+| 11 | `bug/saisie-non-numerique` | Champ places vide/non numerique -> 500 | ✅ Corrige |
 
 ---
 
@@ -198,3 +198,23 @@ l'application de reservation GUDLFT (projet verification & validation).
   - `test_book_donnees_valides_affiche_le_formulaire`.
 - **Verification** : cycle TDD rouge (IndexError 500) puis vert
   (22/22 tests, aucune regression).
+
+### Bug 11 — Saisie non numerique ou champ manquant
+**Branche** : `bug/saisie-non-numerique`
+
+- **Symptome** : `purchasePlaces` plantait (500) si le champ `places` etait vide
+  ou non numerique (`ValueError`), ou si la competition/le club du formulaire
+  etait absent/inconnu (`IndexError`).
+- **Cause** : `server.py`, acces direct `request.form['...']` et `int(...)` sans
+  validation.
+- **Correction** :
+  - lookup competition/club via `request.form.get(...)` + verification de
+    presence (sinon « Reservation invalide. » et retour accueil) ;
+  - lecture du nombre de places dans un `try/except ValueError` (sinon « Veuillez
+    saisir un nombre de places valide. »).
+- **Ajout tests** : `test/functional/test_saisie.py`
+  - `test_places_non_numerique_ne_plante_pas` ;
+  - `test_places_vide_ne_plante_pas` ;
+  - `test_competition_inconnue_ne_plante_pas`.
+- **Verification** : cycle TDD rouge (ValueError/IndexError 500) puis vert
+  (25/25 tests, aucune regression).
