@@ -34,7 +34,7 @@ l'application de reservation GUDLFT (projet verification & validation).
 | 10 | `bug/book-nom-invalide` | Route book : nom de club/competition inexistant -> 500 | ✅ Corrige |
 | 11 | `bug/saisie-non-numerique` | Champ places vide/non numerique -> 500 | ✅ Corrige |
 | 12 | `bug/limite-12-cumulee` | Limite des 12 places non cumulee par competition | ✅ Corrige |
-| 13 | `bug/showsummary-email-manquant` | showSummary sans champ email -> 400 | ⏳ A venir |
+| 13 | `bug/showsummary-email-manquant` | showSummary sans champ email -> 400 | ✅ Corrige |
 
 ---
 
@@ -240,3 +240,17 @@ l'application de reservation GUDLFT (projet verification & validation).
   - `test_cumul_jusqu_a_12_est_accepte` (5 puis 5).
 - **Verification** : cycle TDD rouge (cumul 13 accepte) puis vert
   (27/27 tests, aucune regression).
+
+### Bug 13 — showSummary sans champ email
+**Branche** : `bug/showsummary-email-manquant`
+
+- **Symptome** : une requete POST `/showSummary` sans champ `email` renvoyait une
+  erreur HTTP 400 (acces direct `request.form['email']`).
+- **Cause** : `server.py`, acces par cle directe sur un champ potentiellement
+  absent.
+- **Correction** : `request.form.get('email', '')` ; un email vide est traite
+  comme inconnu (message « Email inconnu » + retour accueil).
+- **Ajout test** (`test/functional/test_connexion.py`) :
+  - `test_showsummary_sans_champ_email_ne_plante_pas`.
+- **Verification** : cycle TDD rouge (400) puis vert
+  (28/28 tests, aucune regression).
