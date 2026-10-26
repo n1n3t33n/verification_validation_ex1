@@ -31,7 +31,7 @@ l'application de reservation GUDLFT (projet verification & validation).
 | 7 | `fonctionnalite/tableau-des-points` | Tableau public des points (phase 2) | ✅ Fait |
 | 8 | `amelioration/competitions-passees` | Reservation sur competition passee | ✅ Corrige |
 | 9 | `bug/places-negatives-ou-nulles` | Reserver un nombre nul ou negatif de places | ✅ Corrige |
-| 10 | `bug/book-nom-invalide` | Route book : nom de club/competition inexistant -> 500 | ⏳ A venir |
+| 10 | `bug/book-nom-invalide` | Route book : nom de club/competition inexistant -> 500 | ✅ Corrige |
 | 11 | `bug/saisie-non-numerique` | Champ places vide/non numerique -> 500 | ⏳ A venir |
 
 ---
@@ -181,3 +181,20 @@ l'application de reservation GUDLFT (projet verification & validation).
   - `test_reservation_zero_place_est_refusee`.
 - **Verification** : cycle TDD rouge (negatif/zero acceptes) puis vert
   (19/19 tests, aucune regression).
+
+### Bug 10 — Route book avec un nom invalide
+**Branche** : `bug/book-nom-invalide`
+
+- **Symptome** : `GET /book/<competition>/<club>` plantait (`IndexError` ->
+  500) si le club ou la competition de l'URL n'existait pas (manipulation d'URL).
+- **Cause** : `server.py`, `book` indexait `[0]` sur une liste potentiellement
+  vide ; le `if/else` suivant etait du code mort.
+- **Correction** : verification `if not foundClub or not foundCompetition` ;
+  message flash « Club ou competition introuvable. » et retour a l'accueil.
+  Suppression du `if/else` mort.
+- **Ajout tests** : `test/functional/test_book.py`
+  - `test_book_competition_inexistante_ne_plante_pas` ;
+  - `test_book_club_inexistant_ne_plante_pas` ;
+  - `test_book_donnees_valides_affiche_le_formulaire`.
+- **Verification** : cycle TDD rouge (IndexError 500) puis vert
+  (22/22 tests, aucune regression).
