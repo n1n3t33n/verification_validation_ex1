@@ -1,6 +1,6 @@
 import json
 from datetime import datetime
-from flask import Flask,render_template,request,redirect,flash,url_for
+from flask import Flask,render_template,request,redirect,flash,url_for,session
 
 
 def loadClubs():
@@ -39,6 +39,8 @@ def showSummary():
         flash("Email inconnu, veuillez reessayer.")
         return render_template('index.html')
     club = matching[0]
+    # Ouvre la session du secretaire pour garder le contexte entre les pages.
+    session['email'] = club['email']
     return render_template('welcome.html', club=club, competitions=competitions)
 
 
@@ -112,6 +114,16 @@ def purchasePlaces():
     return render_template('welcome.html', club=club, competitions=competitions)
 
 
+@app.route('/summary')
+def summary():
+    # Retour au resume du secretaire connecte (via la session), sans re-login.
+    email = session.get('email')
+    club = [c for c in clubs if c['email'] == email]
+    if not club:
+        return redirect(url_for('index'))
+    return render_template('welcome.html', club=club[0], competitions=competitions)
+
+
 @app.route('/pointsBoard')
 def pointsBoard():
     # Tableau public des points : accessible sans connexion (lecture seule).
@@ -120,4 +132,6 @@ def pointsBoard():
 
 @app.route('/logout')
 def logout():
+    # Ferme la session du secretaire.
+    session.pop('email', None)
     return redirect(url_for('index'))

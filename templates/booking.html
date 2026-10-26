@@ -1,17 +1,25 @@
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Booking for {{competition['name']}} || GUDLFT</title>
-</head>
-<body>
-    <h2>{{competition['name']}}</h2>
-    Places available: {{competition['numberOfPlaces']}}
-    <form action="/purchasePlaces" method="post">
-        <input type="hidden" name="club" value="{{club['name']}}">
-        <input type="hidden" name="competition" value="{{competition['name']}}">
-        <label for="places">How many places?</label><input type="number" name="places" id=""/>
-        <button type="submit">Book</button>
+{% extends "layout.html" %}
+{% block title %}R&eacute;servation | GUDLFT{% endblock %}
+
+{% block content %}
+<section class="booking card">
+    <h2>{{ competition['name'] }}</h2>
+    <p class="stat">Places available: {{ competition['numberOfPlaces'] }}</p>
+
+    <form class="form" action="/purchasePlaces" method="post">
+        <input type="hidden" name="club" value="{{ club['name'] }}">
+        <input type="hidden" name="competition" value="{{ competition['name'] }}">
+        <div class="field">
+            <label for="places">How many places?</label>
+            <div class="stepper" data-stepper>
+                <button type="button" class="stepper__btn" data-step="-1" aria-label="Diminuer">&minus;</button>
+                <input type="number" name="places" id="places" min="1" max="12" value="1" inputmode="numeric">
+                <button type="button" class="stepper__btn" data-step="1" aria-label="Augmenter">+</button>
+            </div>
+            <p class="field__hint">Maximum 12 places par comp&eacute;tition.</p>
+        </div>
+        <button class="btn btn-primary" type="submit">Book</button>
     </form>
-</body>
-</html>
+    <a class="btn-link" href="{{ url_for('summary') }}">&larr; Retour &agrave; mes comp&eacute;titions</a>
+</section>
+{% endblock %}

@@ -1,15 +1,28 @@
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Points des clubs | GUDLFT</title>
-</head>
-<body>
+{% extends "layout.html" %}
+{% block title %}Points des clubs | GUDLFT{% endblock %}
+{% block public_nav %}<a href="{{ url_for('index') }}">Accueil</a>{% endblock %}
+
+{% block content %}
+<section class="board">
     <h1>Tableau des points des clubs</h1>
-    <ul>
-    {% for club in clubs %}
-        <li>{{ club['name'] }} : {{ club['points'] }} points</li>
-    {% endfor %}
-    </ul>
-    <a href="{{ url_for('index') }}">Accueil</a>
-</body>
-</html>
+    <p class="muted">Tableau public, en lecture seule &mdash; le solde de points de chaque club.</p>
+    <table class="points-table">
+        <thead>
+            <tr><th>Club</th><th>Points</th></tr>
+        </thead>
+        <tbody>
+        {% for club in clubs %}
+            <tr>
+                <td>{{ club['name'] }}</td>
+                <td class="points">{{ club['points'] }} points</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% if session.get('email') %}
+        <a class="btn-link" href="{{ url_for('summary') }}">&larr; Retour &agrave; mes comp&eacute;titions</a>
+    {% else %}
+        <a class="btn-link" href="{{ url_for('index') }}">&larr; Accueil</a>
+    {% endif %}
+</section>
+{% endblock %}

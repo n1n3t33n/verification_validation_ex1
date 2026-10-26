@@ -12,5 +12,20 @@
     {   "name":"She Lifts",
         "email": "kate@shelifts.co.uk",
         "points":"12"
+    },
+    {
+        "name":"Thunder Lifters",
+        "email": "contact@thunderlifters.com",
+        "points":"8"
+    },
+    {
+        "name":"Steel Peak",
+        "email": "secretary@steelpeak.org",
+        "points":"20"
+    },
+    {
+        "name":"Coastal Crew",
+        "email": "hello@coastalcrew.co",
+        "points":"15"
     }
 ]}

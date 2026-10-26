@@ -34,3 +34,21 @@ def test_showsummary_sans_champ_email_ne_plante_pas(client):
 
     assert response.status_code == 200
     assert b'Email inconnu' in response.data
+
+
+def test_summary_sans_session_redirige_vers_accueil(client):
+    """Acceder a /summary sans etre connecte renvoie vers la page d'accueil."""
+    response = client.get('/summary', follow_redirects=True)
+
+    assert response.status_code == 200
+    assert b'GUDLFT Registration Portal' in response.data
+
+
+def test_summary_avec_session_affiche_le_resume(client):
+    """Apres connexion, /summary affiche le resume sans re-saisir l'email."""
+    client.post('/showSummary', data={'email': 'john@simplylift.co'})
+
+    response = client.get('/summary')
+
+    assert response.status_code == 200
+    assert b'Welcome' in response.data
