@@ -16,3 +16,15 @@ def client():
     server.app.config['TESTING'] = True
     with server.app.test_client() as test_client:
         yield test_client
+
+
+@pytest.fixture(autouse=True)
+def reset_donnees():
+    """Recharge les donnees en memoire avant chaque test.
+
+    Les clubs et competitions sont stockes dans des variables globales que les
+    routes modifient (reservations). On les recharge depuis les fichiers JSON
+    avant chaque test pour garantir l'isolation.
+    """
+    server.clubs = server.loadClubs()
+    server.competitions = server.loadCompetitions()

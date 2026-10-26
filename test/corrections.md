@@ -24,7 +24,7 @@ l'application de reservation GUDLFT (projet verification & validation).
 |---|---------|-------|--------|
 | 1 | `bug/lancement-application` | Lancement de l'application | ✅ Corrige |
 | 2 | `bug/connexion-email-inexistant` | Email inconnu -> crash 500 | ✅ Corrige |
-| 3 | `bug/reservation-superieure-aux-points` | Reserver plus que ses points | ⏳ A venir |
+| 3 | `bug/reservation-superieure-aux-points` | Reserver plus que ses points | ✅ Corrige |
 | 4 | `bug/reservation-superieure-a-12-places` | Reserver plus de 12 places | ⏳ A venir |
 | 5 | `bug/places-insuffisantes-competition` | Reserver plus de places que disponibles | ⏳ A venir |
 | 6 | `bug/deduction-des-points` | Points jamais deduits | ⏳ A venir |
@@ -65,3 +65,19 @@ l'application de reservation GUDLFT (projet verification & validation).
   - `test_email_connu_affiche_le_resume` : email valide -> page « Welcome ».
 - **Verification** : cycle TDD rouge (2 echecs sur `IndexError`) puis vert
   (5/5 tests, aucune regression du bug 1).
+
+### Bug 3 — Reserver plus de places que de points
+**Branche** : `bug/reservation-superieure-aux-points`
+
+- **Symptome** : un club pouvait reserver plus de places qu'il n'a de points.
+- **Cause** : `server.py`, `purchasePlaces` ne comparait jamais les places
+  demandees au solde de points du club (regle : 1 point = 1 place).
+- **Correction** : ajout d'un garde-fou dans `purchasePlaces` ; si les places
+  demandees depassent les points du club, message flash « Vous n'avez pas assez
+  de points... » et reservation refusee.
+- **Ajout tests** : fixture `reset_donnees` dans `conftest.py` (isolation des
+  donnees en memoire entre les tests), et `test/functional/test_reservation.py`
+  - `test_reservation_superieure_aux_points_est_refusee` (Iron Temple, 4 pts, 5 places) ;
+  - `test_reservation_dans_la_limite_des_points_est_acceptee` (Iron Temple, 3 places).
+- **Verification** : cycle TDD rouge (reservation acceptee a tort) puis vert
+  (7/7 tests, aucune regression).
