@@ -75,7 +75,93 @@ Merci !
     We also like to show how well we're testing, so there's a module called 
     [coverage](https://coverage.readthedocs.io/en/coverage-5.1/) you should add to your project.
    
- 6. Flake8 Report 
+ 6. Flake8 Report
+
+    Le code respecte flake8 (0 violation). Rapport complet : [RAPPORT_FLAKE8.md](RAPPORT_FLAKE8.md).
+
+---
+
+> La section ci-dessous a ete **ajoutee** lors de la reprise du projet
+> (corrections de bugs, phase 2, refonte de l'interface, tests, rapports).
+> Elle ne modifie pas le contenu d'origine ci-dessus.
+
+## Lancer le projet (ajouts)
+
+### 1. Pre-requis
+
+Depuis le dossier du projet, avec l'environnement virtuel **active** :
+
+```
+pip install -r requirements.txt
+```
+
+> Sous Windows / PowerShell, l'activation du venv se fait avec
+> `venv\Scripts\Activate.ps1` (au lieu de `source bin/activate`).
+
+### 2. Lancer le serveur
+
+Le lancement est configure par le fichier `.flaskenv` (`FLASK_APP=server.py`),
+charge automatiquement par `python-dotenv`. Il suffit donc de :
+
+```
+flask run
+```
+
+L'application repond sur http://127.0.0.1:5000.
+
+### 3. Lancer les tests
+
+Les tests (pytest) sont regroupes dans `test/` (`unit/` et `functional/`).
+Depuis la racine du projet :
+
+```
+pytest
+```
+
+### 4. Couverture de tests
+
+```
+coverage run --source=server,booking,conftest -m pytest
+coverage report -m      # resume dans la console
+coverage html           # rapport HTML detaille dans htmlcov/
+```
+
+### 5. Rapport flake8 (style / PEP 8)
+
+La configuration est dans `setup.cfg` (`max-line-length = 99`).
+
+```
+flake8 server.py booking.py conftest.py locustfile.py test
+```
+
+Code de sortie 0 et aucune ligne affichee = aucune violation.
+Synthese : [RAPPORT_FLAKE8.md](RAPPORT_FLAKE8.md).
+
+### 6. Tests de performance (Locust)
+
+Le scenario est dans `locustfile.py`. Demarrer d'abord le serveur
+(`flask run`) dans un terminal, puis, dans un second terminal :
+
+```
+# Interface web (ouvrir http://localhost:8089, saisir 6 utilisateurs) :
+locust -f locustfile.py --host http://127.0.0.1:5000
+
+# Ou sans interface (6 utilisateurs, 30 secondes) :
+locust -f locustfile.py --host http://127.0.0.1:5000 --users 6 --spawn-rate 1 --run-time 30s --headless
+```
+
+Synthese : [RAPPORT_DE_PERFORMANCE.md](RAPPORT_DE_PERFORMANCE.md).
+
+### Fichiers et documents ajoutes
+
+- `.flaskenv` — configuration du lancement (`flask run`).
+- `booking.py` — regles metier de reservation (fonctions pures).
+- `conftest.py`, `test/unit/`, `test/functional/` — harnais et tests.
+- `static/`, `templates/layout.html` — interface web (CSS, JS, gabarit partage).
+- `locustfile.py` — scenario de test de performance.
+- `setup.cfg` — configuration flake8.
+- `RAPPORT_DE_TEST.md`, `RAPPORT_DE_PERFORMANCE.md`, `RAPPORT_FLAKE8.md` — rapports.
+- `test/corrections.md` — journal detaille des corrections.
     
 
 
