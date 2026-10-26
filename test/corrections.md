@@ -29,7 +29,7 @@ l'application de reservation GUDLFT (projet verification & validation).
 | 5 | `bug/places-insuffisantes-competition` | Reserver plus de places que disponibles | ✅ Corrige |
 | 6 | `bug/deduction-des-points` | Points jamais deduits | ✅ Corrige |
 | 7 | `fonctionnalite/tableau-des-points` | Tableau public des points (phase 2) | ✅ Fait |
-| 8 | `amelioration/competitions-passees` | Reservation sur competition passee | ⏳ Optionnel |
+| 8 | `amelioration/competitions-passees` | Reservation sur competition passee | ✅ Corrige |
 
 ---
 
@@ -142,3 +142,22 @@ l'application de reservation GUDLFT (projet verification & validation).
   - `test_tableau_points_affiche_les_clubs_et_leurs_points` (clubs + points).
 - **Verification** : cycle TDD rouge (route 404) puis vert
   (15/15 tests, aucune regression).
+
+### Bug 8 — Reservation sur une competition passee
+**Branche** : `amelioration/competitions-passees`
+
+- **Symptome** : un club pouvait reserver sur une competition dont la date est
+  deja passee (les specs parlent de competitions « a venir »).
+- **Cause** : `server.py`, `purchasePlaces` ne comparait pas la date de la
+  competition a la date du jour.
+- **Correction** : import `datetime` + garde-fou comparant
+  `datetime.strptime(competition['date'], ...)` a `datetime.now()` ; si passee,
+  message flash « Cette competition est deja passee... » et refus.
+- **Infra tests** : la fixture `reset_donnees` (`conftest.py`) force desormais
+  des dates de competition « a venir » par defaut, pour que les tests de
+  reservation restent valides.
+- **Ajout tests** : `test/functional/test_competition_passee.py`
+  - `test_reservation_sur_competition_passee_est_refusee` ;
+  - `test_reservation_sur_competition_future_est_acceptee`.
+- **Verification** : cycle TDD rouge (reservation passee acceptee) puis vert
+  (17/17 tests, aucune regression).

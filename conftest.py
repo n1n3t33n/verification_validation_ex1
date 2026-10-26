@@ -5,6 +5,8 @@ La presence de ce fichier a la racine du projet ajoute le dossier du projet au
 
 Les tests doivent etre lances depuis la racine du projet : `pytest`.
 """
+from datetime import datetime, timedelta
+
 import pytest
 
 import server
@@ -28,3 +30,7 @@ def reset_donnees():
     """
     server.clubs = server.loadClubs()
     server.competitions = server.loadCompetitions()
+    # Par defaut, les competitions de test sont a venir (reservation possible).
+    date_future = (datetime.now() + timedelta(days=365)).strftime('%Y-%m-%d %H:%M:%S')
+    for competition in server.competitions:
+        competition['date'] = date_future
