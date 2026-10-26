@@ -51,8 +51,14 @@ def book(competition,club):
 
 @app.route('/purchasePlaces',methods=['POST'])
 def purchasePlaces():
-    competition = [c for c in competitions if c['name'] == request.form['competition']][0]
-    club = [c for c in clubs if c['name'] == request.form['club']][0]
+    foundCompetition = [c for c in competitions if c['name'] == request.form.get('competition')]
+    foundClub = [c for c in clubs if c['name'] == request.form.get('club')]
+    # Donnees de formulaire incompletes ou inconnues : on evite le plantage.
+    if not foundCompetition or not foundClub:
+        flash("Reservation invalide.")
+        return render_template('index.html')
+    competition = foundCompetition[0]
+    club = foundClub[0]
 
     # On refuse la reservation si la competition est deja passee.
     dateCompetition = datetime.strptime(competition['date'], '%Y-%m-%d %H:%M:%S')
@@ -60,7 +66,12 @@ def purchasePlaces():
         flash("Cette competition est deja passee, reservation impossible.")
         return render_template('welcome.html', club=club, competitions=competitions)
 
-    placesRequired = int(request.form['places'])
+    # Le nombre de places doit etre un entier valide.
+    try:
+        placesRequired = int(request.form.get('places', ''))
+    except ValueError:
+        flash("Veuillez saisir un nombre de places valide.")
+        return render_template('welcome.html', club=club, competitions=competitions)
 
     # On refuse une demande de places nulle ou negative.
     if placesRequired <= 0:
