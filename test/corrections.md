@@ -23,7 +23,7 @@ l'application de reservation GUDLFT (projet verification & validation).
 | # | Branche | Sujet | Statut |
 |---|---------|-------|--------|
 | 1 | `bug/lancement-application` | Lancement de l'application | ✅ Corrige |
-| 2 | `bug/connexion-email-inexistant` | Email inconnu -> crash 500 | ⏳ A venir |
+| 2 | `bug/connexion-email-inexistant` | Email inconnu -> crash 500 | ✅ Corrige |
 | 3 | `bug/reservation-superieure-aux-points` | Reserver plus que ses points | ⏳ A venir |
 | 4 | `bug/reservation-superieure-a-12-places` | Reserver plus de 12 places | ⏳ A venir |
 | 5 | `bug/places-insuffisantes-competition` | Reserver plus de places que disponibles | ⏳ A venir |
@@ -47,3 +47,21 @@ l'application de reservation GUDLFT (projet verification & validation).
   - `test_page_accueil_renvoie_200` : la page d'accueil repond 200 ;
   - `test_page_accueil_affiche_le_titre` : la page contient « GUDLFT ».
 - **Verification** : `flask run` demarre et sert la page d'accueil ; `pytest` au vert.
+
+### Bug 2 — Connexion avec un email inexistant
+**Branche** : `bug/connexion-email-inexistant`
+
+- **Symptome** : `POST /showSummary` avec un email absent de `clubs.json` ->
+  `IndexError` -> erreur 500 (plantage).
+- **Cause** : `server.py`, `showSummary` -> `[... for club in clubs if ...][0]`
+  indexait `[0]` sur une liste vide quand aucun club ne correspondait.
+- **Correction** :
+  - `server.py` : verification de la liste des correspondances ; si vide, message
+    flash « Email inconnu, veuillez reessayer. » et retour a la page d'accueil ;
+  - `templates/index.html` : ajout du bloc d'affichage des messages flash.
+- **Tests** : `test/functional/test_connexion.py`
+  - `test_email_inconnu_ne_plante_pas` : email inconnu -> 200 (plus de 500) ;
+  - `test_email_inconnu_affiche_un_message_d_erreur` : message d'erreur present ;
+  - `test_email_connu_affiche_le_resume` : email valide -> page « Welcome ».
+- **Verification** : cycle TDD rouge (2 echecs sur `IndexError`) puis vert
+  (5/5 tests, aucune regression du bug 1).
