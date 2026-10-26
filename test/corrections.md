@@ -28,7 +28,7 @@ l'application de reservation GUDLFT (projet verification & validation).
 | 4 | `bug/reservation-superieure-a-12-places` | Reserver plus de 12 places | ✅ Corrige |
 | 5 | `bug/places-insuffisantes-competition` | Reserver plus de places que disponibles | ✅ Corrige |
 | 6 | `bug/deduction-des-points` | Points jamais deduits | ✅ Corrige |
-| 7 | `fonctionnalite/tableau-des-points` | Tableau public des points (phase 2) | ⏳ A venir |
+| 7 | `fonctionnalite/tableau-des-points` | Tableau public des points (phase 2) | ✅ Fait |
 | 8 | `amelioration/competitions-passees` | Reservation sur competition passee | ⏳ Optionnel |
 
 ---
@@ -127,3 +127,18 @@ l'application de reservation GUDLFT (projet verification & validation).
   - `test_points_non_deduits_si_reservation_refusee` (solde inchange si refus).
 - **Verification** : cycle TDD rouge (points non deduits) puis vert
   (13/13 tests, aucune regression).
+
+### Bug 7 — Tableau public des points (phase 2)
+**Branche** : `fonctionnalite/tableau-des-points`
+
+- **Besoin** : un tableau public, en lecture seule, listant les points de tous
+  les clubs, accessible sans connexion (specs phase 2).
+- **Realisation** :
+  - `server.py` : nouvelle route `GET /pointsBoard` (sans authentification) qui
+    rend le template avec la liste des clubs ;
+  - `templates/points.html` : nouveau template listant chaque club et ses points.
+- **Tests** : `test/functional/test_tableau_points.py`
+  - `test_tableau_points_accessible_sans_connexion` (200 sans login) ;
+  - `test_tableau_points_affiche_les_clubs_et_leurs_points` (clubs + points).
+- **Verification** : cycle TDD rouge (route 404) puis vert
+  (15/15 tests, aucune regression).
