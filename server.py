@@ -79,7 +79,10 @@ def purchasePlaces():
     return render_template('welcome.html', club=club, competitions=competitions)
 
 
-# TODO: Add route for points display
+@app.route('/pointsBoard')
+def pointsBoard():
+    # Tableau public des points : accessible sans connexion (lecture seule).
+    return render_template('points.html', clubs=clubs)
 
 
 @app.route('/logout')

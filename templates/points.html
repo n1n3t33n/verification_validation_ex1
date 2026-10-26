@@ -1,0 +1,15 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Points des clubs | GUDLFT</title>
+</head>
+<body>
+    <h1>Tableau des points des clubs</h1>
+    <ul>
+    {% for club in clubs %}
+        <li>{{ club['name'] }} : {{ club['points'] }} points</li>
+    {% endfor %}
+    </ul>
+    <a href="{{ url_for('index') }}">Accueil</a>
+</body>
+</html>
