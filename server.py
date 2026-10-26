@@ -17,6 +17,9 @@ def loadCompetitions():
 app = Flask(__name__)
 app.secret_key = 'something_special'
 
+# Nombre maximum de places qu'un club peut reserver par competition.
+MAX_PLACES_PAR_RESERVATION = 12
+
 competitions = loadCompetitions()
 clubs = loadClubs()
 
@@ -55,6 +58,11 @@ def purchasePlaces():
     # Un point vaut une place : on refuse si le club demande plus que son solde.
     if placesRequired > clubPoints:
         flash("Vous n'avez pas assez de points pour reserver autant de places.")
+        return render_template('welcome.html', club=club, competitions=competitions)
+
+    # Regle metier : au maximum 12 places par reservation.
+    if placesRequired > MAX_PLACES_PAR_RESERVATION:
+        flash("Vous ne pouvez pas reserver plus de 12 places.")
         return render_template('welcome.html', club=club, competitions=competitions)
 
     competition['numberOfPlaces'] = int(competition['numberOfPlaces'])-placesRequired

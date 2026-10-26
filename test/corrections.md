@@ -25,7 +25,7 @@ l'application de reservation GUDLFT (projet verification & validation).
 | 1 | `bug/lancement-application` | Lancement de l'application | ✅ Corrige |
 | 2 | `bug/connexion-email-inexistant` | Email inconnu -> crash 500 | ✅ Corrige |
 | 3 | `bug/reservation-superieure-aux-points` | Reserver plus que ses points | ✅ Corrige |
-| 4 | `bug/reservation-superieure-a-12-places` | Reserver plus de 12 places | ⏳ A venir |
+| 4 | `bug/reservation-superieure-a-12-places` | Reserver plus de 12 places | ✅ Corrige |
 | 5 | `bug/places-insuffisantes-competition` | Reserver plus de places que disponibles | ⏳ A venir |
 | 6 | `bug/deduction-des-points` | Points jamais deduits | ⏳ A venir |
 | 7 | `fonctionnalite/tableau-des-points` | Tableau public des points (phase 2) | ⏳ A venir |
@@ -81,3 +81,17 @@ l'application de reservation GUDLFT (projet verification & validation).
   - `test_reservation_dans_la_limite_des_points_est_acceptee` (Iron Temple, 3 places).
 - **Verification** : cycle TDD rouge (reservation acceptee a tort) puis vert
   (7/7 tests, aucune regression).
+
+### Bug 4 — Reserver plus de 12 places
+**Branche** : `bug/reservation-superieure-a-12-places`
+
+- **Symptome** : un club pouvait reserver plus de 12 places (regle : 12 max).
+- **Cause** : `server.py`, `purchasePlaces` ne limitait pas le nombre de places.
+- **Correction** : constante `MAX_PLACES_PAR_RESERVATION = 12` + garde-fou dans
+  `purchasePlaces` ; au-dela de 12 places, message flash « Vous ne pouvez pas
+  reserver plus de 12 places. » et reservation refusee.
+- **Ajout tests** (`test/functional/test_reservation.py`) :
+  - `test_reservation_superieure_a_12_est_refusee` (Simply Lift, 13 places) ;
+  - `test_reservation_de_12_places_est_acceptee` (borne exacte, 12 places).
+- **Verification** : cycle TDD rouge (13 places accepte a tort) puis vert
+  (9/9 tests, aucune regression).
