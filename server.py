@@ -1,20 +1,21 @@
 import json
 from datetime import datetime
-from flask import Flask,render_template,request,redirect,flash,url_for,session
+from flask import (Flask, render_template, request, redirect, flash,
+                   url_for, session)
 
 import booking
 
 
 def loadClubs():
     with open('clubs.json') as c:
-         listOfClubs = json.load(c)['clubs']
-         return listOfClubs
+        listOfClubs = json.load(c)['clubs']
+        return listOfClubs
 
 
 def loadCompetitions():
     with open('competitions.json') as comps:
-         listOfCompetitions = json.load(comps)['competitions']
-         return listOfCompetitions
+        listOfCompetitions = json.load(comps)['competitions']
+        return listOfCompetitions
 
 
 app = Flask(__name__)
@@ -29,14 +30,16 @@ reservationsParClub = {}
 
 def render_welcome(club):
     """Rend la page de resume d'un club (facteur commun a plusieurs vues)."""
-    return render_template('welcome.html', club=club, competitions=competitions)
+    return render_template('welcome.html', club=club,
+                           competitions=competitions)
 
 
 @app.route('/')
 def index():
     return render_template('index.html')
 
-@app.route('/showSummary',methods=['POST'])
+
+@app.route('/showSummary', methods=['POST'])
 def showSummary():
     # request.form.get evite l'erreur 400 si le champ 'email' est absent.
     matching = [c for c in clubs if c['email'] == request.form.get('email', '')]
@@ -50,19 +53,21 @@ def showSummary():
 
 
 @app.route('/book/<competition>/<club>')
-def book(competition,club):
+def book(competition, club):
     foundClub = [c for c in clubs if c['name'] == club]
     foundCompetition = [c for c in competitions if c['name'] == competition]
-    # Si le club ou la competition de l'URL est introuvable, on evite le plantage.
+    # Si le club ou la competition de l'URL est introuvable, on evite le crash.
     if not foundClub or not foundCompetition:
         flash("Club ou competition introuvable.")
         return render_template('index.html')
-    return render_template('booking.html', club=foundClub[0], competition=foundCompetition[0])
+    return render_template('booking.html', club=foundClub[0],
+                           competition=foundCompetition[0])
 
 
-@app.route('/purchasePlaces',methods=['POST'])
+@app.route('/purchasePlaces', methods=['POST'])
 def purchasePlaces():
-    foundCompetition = [c for c in competitions if c['name'] == request.form.get('competition')]
+    foundCompetition = [c for c in competitions
+                        if c['name'] == request.form.get('competition')]
     foundClub = [c for c in clubs if c['name'] == request.form.get('club')]
     # Donnees de formulaire incompletes ou inconnues : on evite le plantage.
     if not foundCompetition or not foundClub:
@@ -95,7 +100,8 @@ def purchasePlaces():
         return render_welcome(club)
 
     # Application de l'etat (mutation des donnees en memoire).
-    competition['numberOfPlaces'] = int(competition['numberOfPlaces']) - placesRequired
+    competition['numberOfPlaces'] = (int(competition['numberOfPlaces'])
+                                     - placesRequired)
     club['points'] = int(club['points']) - placesRequired
     reservationsParClub[cle] = dejaReservees + placesRequired
     flash('Great-booking complete!')
